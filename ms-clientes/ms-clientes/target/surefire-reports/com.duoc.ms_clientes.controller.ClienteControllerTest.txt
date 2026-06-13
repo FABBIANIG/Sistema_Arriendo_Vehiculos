@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: com.duoc.ms_clientes.controller.ClienteControllerTest
--------------------------------------------------------------------------------
-Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 10.23 s -- in com.duoc.ms_clientes.controller.ClienteControllerTest
