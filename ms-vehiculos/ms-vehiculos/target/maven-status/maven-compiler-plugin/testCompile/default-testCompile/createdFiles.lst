@@ -1,0 +1,5 @@
+com\duoc\msvehiculos\controller\VehiculoControllerTest.class
+com\duoc\msvehiculos\MsVehiculosApplicationTests.class
+com\duoc\msvehiculos\service\CategoriaServiceTest.class
+com\duoc\msvehiculos\service\VehiculoServiceTest.class
+com\duoc\msvehiculos\controller\CategoriaControllerTest.class
