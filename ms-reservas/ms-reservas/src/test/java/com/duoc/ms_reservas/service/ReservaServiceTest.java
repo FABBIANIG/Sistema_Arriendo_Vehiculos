@@ -4,7 +4,6 @@ import com.duoc.ms_reservas.dto.ClienteDTO;
 import com.duoc.ms_reservas.dto.ReservaDTO;
 import com.duoc.ms_reservas.dto.ReservaRequestDTO;
 import com.duoc.ms_reservas.dto.VehiculoDTO;
-import com.duoc.ms_reservas.exception.ResourceNotFoundException;
 import com.duoc.ms_reservas.feign.ClienteClient;
 import com.duoc.ms_reservas.feign.VehiculoClient;
 import com.duoc.ms_reservas.mapper.ReservaMapper;
@@ -97,7 +96,6 @@ class ReservaServiceTest {
         request.setFechaInicio(LocalDate.now().plusDays(5));
         request.setFechaFin(LocalDate.now()); // Inconsistente
 
-        // WHEN & THEN
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
             reservaService.save(request);
         });
@@ -126,12 +124,11 @@ class ReservaServiceTest {
         Mockito.when(clienteClient.obtenerClientePorId(1)).thenReturn(clienteMock);
         Mockito.when(vehiculoClient.obtenerVehiculoPorId(10)).thenReturn(vehiculoMock);
 
-        // WHEN & THEN
         Assertions.assertThrows(IllegalStateException.class, () -> {
             reservaService.save(request);
         });
 
-        // Verificación: Al no estar disponible, el flujo se corta y nunca busca el estado ni guarda en BD
+        // Verificacion: Al no estar disponible, el flujo se corta y nunca busca el estado ni guarda en BD
         Mockito.verify(estadoReservaRepository, Mockito.never()).findById(Mockito.anyInt());
         Mockito.verify(reservaRepository, Mockito.never()).save(Mockito.any());
     }
