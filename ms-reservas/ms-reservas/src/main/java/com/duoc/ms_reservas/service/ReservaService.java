@@ -33,7 +33,6 @@ public class ReservaService {
 
     public List<ReservaDTO> findAll() {
         try {
-            // agregado: log para listar todas las reservas
             log.info("Listando todas las reservas");
 
             return reservaRepository.findAll()
@@ -49,7 +48,6 @@ public class ReservaService {
 
     public ReservaDTO findById(Integer id) {
         try {
-            // agregado: log para buscar reserva por id
             log.info("Buscando reserva con id: {}", id);
 
             Reserva reserva = reservaRepository.findById(id)
@@ -67,10 +65,12 @@ public class ReservaService {
 
     public ReservaDTO save(ReservaRequestDTO requestDTO) {
         try {
-            // agregado: log para crear reserva
             log.info("Creando nueva reserva");
 
-            // agregado: verifica que el cliente exista en ms-clientes
+            // REGLA DE NEGOCIO OBLIGATORIA (IE 2.2.1): Validar consistencia cronológica de fechas
+            validarFechasReserva(requestDTO.getFechaInicio(), requestDTO.getFechaFin());
+
+            // Verifica que el cliente exista en ms-clientes
             ClienteDTO cliente = clienteClient.obtenerClientePorId(requestDTO.getClienteId());
 
             if (cliente == null || cliente.getId() == null) {
@@ -79,7 +79,7 @@ public class ReservaService {
                 );
             }
 
-            // agregado: verifica que el vehículo exista en ms-vehiculos
+            // Verifica que el vehículo exista en ms-vehiculos
             VehiculoDTO vehiculo = vehiculoClient.obtenerVehiculoPorId(requestDTO.getVehiculoId());
 
             if (vehiculo == null || vehiculo.getId() == null) {
@@ -88,7 +88,7 @@ public class ReservaService {
                 );
             }
 
-            // agregado: valida disponibilidad del vehículo
+            // Valida disponibilidad del vehículo
             if (vehiculo.getDisponible() != null && !vehiculo.getDisponible()) {
                 throw new IllegalStateException("El vehículo no se encuentra disponible para reservar");
             }
@@ -111,15 +111,16 @@ public class ReservaService {
 
     public ReservaDTO update(Integer id, ReservaRequestDTO requestDTO) {
         try {
-            // agregado: actualización campo por campo para PUT
             log.info("Actualizando reserva con id: {}", id);
+
+            // REGLA DE NEGOCIO OBLIGATORIA (IE 2.2.1): Validar consistencia cronológica de fechas
+            validarFechasReserva(requestDTO.getFechaInicio(), requestDTO.getFechaFin());
 
             Reserva reserva = reservaRepository.findById(id)
                     .orElseThrow(() -> new ResourceNotFoundException(
                             "Reserva no encontrada con id: " + id
                     ));
 
-            // agregado: verifica que el cliente exista en ms-clientes
             ClienteDTO cliente = clienteClient.obtenerClientePorId(requestDTO.getClienteId());
 
             if (cliente == null || cliente.getId() == null) {
@@ -128,7 +129,6 @@ public class ReservaService {
                 );
             }
 
-            // agregado: verifica que el vehículo exista en ms-vehiculos
             VehiculoDTO vehiculo = vehiculoClient.obtenerVehiculoPorId(requestDTO.getVehiculoId());
 
             if (vehiculo == null || vehiculo.getId() == null) {
@@ -156,7 +156,6 @@ public class ReservaService {
 
     public void delete(Integer id) {
         try {
-            // agregado: log para eliminar reserva
             log.info("Eliminando reserva con id: {}", id);
 
             Reserva reserva = reservaRepository.findById(id)
@@ -174,7 +173,6 @@ public class ReservaService {
 
     public List<ReservaDTO> findByFechaInicioDesde(LocalDate fecha) {
         try {
-            // agregado: JPQL solicitado en la pauta
             log.info("Buscando reservas desde la fecha: {}", fecha);
 
             return reservaRepository.buscarReservasDesdeFecha(fecha)
@@ -185,6 +183,13 @@ public class ReservaService {
         } catch (Exception e) {
             log.error("Error al buscar reservas desde la fecha: {}", fecha, e);
             throw e;
+        }
+    }
+    // Metodo privado auxiliar que asiste a save y update para mantener la integridad de los datos
+
+    private void validarFechasReserva(LocalDate inicio, LocalDate fin) {
+        if (fin.isBefore(inicio)) {
+            throw new IllegalArgumentException("La fecha de finalización no puede ser anterior a la fecha de inicio.");
         }
     }
 }

@@ -2,7 +2,9 @@ package com.duoc.ms_reservas.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.springframework.hateoas.RepresentationModel;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -10,7 +12,8 @@ import java.time.LocalDate;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReservaDTO {
+@EqualsAndHashCode(callSuper = true) // Necesario por heredar de RepresentationModel
+public class ReservaDTO extends RepresentationModel<ReservaDTO> {
 
     private Integer id;
     private Integer clienteId;
