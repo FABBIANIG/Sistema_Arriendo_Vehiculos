@@ -148,8 +148,8 @@ public class ReservaController {
                                             {
                                               "clienteId": 1,
                                               "vehiculoId": 2,
-                                              "fechaInicio": "2025-07-01",
-                                              "fechaFin": "2025-07-05",
+                                              "fechaInicio": "2026-07-01",
+                                              "fechaFin": "2026-07-05",
                                               "cantidadDias": 4,
                                               "montoTotal": 120000,
                                               "observacion": "Reserva para viaje de negocios",
@@ -167,7 +167,7 @@ public class ReservaController {
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    // PUT /reservas/{id}
+    // PUT /reservas/id
     // ─────────────────────────────────────────────────────────────────────────
     @Operation(
             summary = "Actualizar una reserva existente",
@@ -195,7 +195,7 @@ public class ReservaController {
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    // DELETE /reservas/{id}
+    // DELETE /reservas/id
     // ─────────────────────────────────────────────────────────────────────────
     @Operation(
             summary = "Eliminar una reserva",
@@ -235,7 +235,7 @@ public class ReservaController {
     public ResponseEntity<List<ReservaDTO>> findByFechaInicioDesde(
             @Parameter(
                     description = "Fecha de inicio mínima (formato ISO: yyyy-MM-dd)",
-                    example = "2025-07-01",
+                    example = "2026-07-01",
                     required = true
             )
             @RequestParam
