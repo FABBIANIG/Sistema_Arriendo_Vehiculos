@@ -11,6 +11,7 @@ import com.duoc.ms_reservas.model.EstadoReserva;
 import com.duoc.ms_reservas.model.Reserva;
 import com.duoc.ms_reservas.repository.EstadoReservaRepository;
 import com.duoc.ms_reservas.repository.ReservaRepository;
+import com.duoc.ms_reservas.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,6 +24,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Optional;
+import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
 class ReservaServiceTest {
@@ -131,5 +133,59 @@ class ReservaServiceTest {
         // Verificacion: Al no estar disponible, el flujo se corta y nunca busca el estado ni guarda en BD
         Mockito.verify(estadoReservaRepository, Mockito.never()).findById(Mockito.anyInt());
         Mockito.verify(reservaRepository, Mockito.never()).save(Mockito.any());
+    }
+
+    @Test
+    @DisplayName("Debería retornar todas las reservas mapeadas")
+    void findAll_ReturnsReservaDTOList() {
+        Reserva reserva = new Reserva();
+        reserva.setId(1);
+        ReservaDTO reservaDTO = new ReservaDTO();
+        reservaDTO.setId(1);
+
+        Mockito.when(reservaRepository.findAll()).thenReturn(List.of(reserva));
+        Mockito.when(reservaMapper.toDTO(reserva)).thenReturn(reservaDTO);
+
+        var resultado = reservaService.findAll();
+
+        Assertions.assertEquals(1, resultado.size());
+        Assertions.assertEquals(1, resultado.get(0).getId());
+        Mockito.verify(reservaRepository).findAll();
+    }
+
+    @Test
+    @DisplayName("Debería retornar una reserva al buscar por un ID existente")
+    void findById_WhenExists_ReturnsReservaDTO() {
+        Reserva reserva = new Reserva();
+        reserva.setId(1);
+        ReservaDTO reservaDTO = new ReservaDTO();
+        reservaDTO.setId(1);
+
+        Mockito.when(reservaRepository.findById(1)).thenReturn(Optional.of(reserva));
+        Mockito.when(reservaMapper.toDTO(reserva)).thenReturn(reservaDTO);
+
+        ReservaDTO resultado = reservaService.findById(1);
+
+        Assertions.assertEquals(1, resultado.getId());
+    }
+
+    @Test
+    @DisplayName("Debería lanzar excepción cuando no existe la reserva buscada")
+    void findById_WhenNotExists_ThrowsResourceNotFoundException() {
+        Mockito.when(reservaRepository.findById(99)).thenReturn(Optional.empty());
+
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> reservaService.findById(99));
+    }
+
+    @Test
+    @DisplayName("Debería eliminar una reserva existente")
+    void delete_WhenExists_DeletesReserva() {
+        Reserva reserva = new Reserva();
+        reserva.setId(1);
+        Mockito.when(reservaRepository.findById(1)).thenReturn(Optional.of(reserva));
+
+        reservaService.delete(1);
+
+        Mockito.verify(reservaRepository).delete(reserva);
     }
 }
